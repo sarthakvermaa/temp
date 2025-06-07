@@ -1,0 +1,166 @@
+{
+  "resource": {
+    "applicationName": "oracle_fusion",
+    "description": "Get all questionnaires",
+    "input": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "effectiveDate": {
+            "type": "string",
+            "title": "Effective Date",
+            "description": "Effective date for fetching resources (format: yyyy-MM-dd)"
+          },
+          "expand": {
+            "type": "string",
+            "title": "Expand",
+            "description": "Comma-separated list of child resources to expand"
+          },
+          "fields": {
+            "type": "string",
+            "title": "Fields",
+            "description": "Comma-separated list of fields to include in the response"
+          },
+          "finder": {
+            "type": "string",
+            "title": "Finder",
+            "description": "Predefined finder to search the collection"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "Number of resources to return"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset",
+            "description": "Starting position of the resource collection"
+          },
+          "orderBy": {
+            "type": "string",
+            "title": "Order By",
+            "description": "Fields to order the resources by, with optional asc/desc"
+          },
+          "q": {
+            "type": "string",
+            "title": "Filter Query",
+            "description": "Where clause expressions to filter the collection"
+          },
+          "totalResults": {
+            "type": "boolean",
+            "title": "Total Results",
+            "description": "Include estimated row count if true"
+          }
+        }
+      }
+    },
+    "name": "oracle_fusion_get_all_questionnaires",
+    "needsAuthentication": true,
+    "output": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "totalResults": {
+            "type": "integer",
+            "title": "Total Results"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "hasMore": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "items": {
+            "title": "Questionnaires",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "QuestionnaireId": {
+                  "type": "integer",
+                  "title": "Questionnaire ID"
+                },
+                "QuestionnaireName": {
+                  "type": "string",
+                  "title": "Questionnaire Name"
+                },
+                "QuestionnaireCode": {
+                  "type": "string",
+                  "title": "Questionnaire Code"
+                },
+                "Status": {
+                  "type": "string",
+                  "title": "Status"
+                },
+                "LatestVersionFlag": {
+                  "type": "boolean",
+                  "title": "Is Latest Version"
+                },
+                "CreationDate": {
+                  "type": "string",
+                  "title": "Creation Date"
+                },
+                "LastUpdateDate": {
+                  "type": "string",
+                  "title": "Last Update Date"
+                },
+                "FolderName": {
+                  "type": "string",
+                  "title": "Folder Name"
+                },
+                "SubscriberName": {
+                  "type": "string",
+                  "title": "Subscriber Name"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "title": "Get all questionnaires",
+    "resourceTypes": [
+      "ACTION"
+    ]
+  },
+  "connectorConfig": {
+    "client": {
+      "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
+      "baseUrlTemplate": "{{input.auth.domain}}",
+      "httpMethod": "GET",
+      "pathTemplate": "/hcmRestApi/resources/11.13.18.05/questionnaires",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": {
+        "effectiveDate": "{{rawPayload.effectiveDate}}",
+        "expand": "{{rawPayload.expand}}",
+        "fields": "{{rawPayload.fields}}",
+        "finder": "{{rawPayload.finder}}",
+        "limit": "{{rawPayload.limit}}",
+        "offset": "{{rawPayload.offset}}",
+        "orderBy": "{{rawPayload.orderBy}}",
+        "q": "{{rawPayload.q}}",
+        "totalResults": "{{rawPayload.totalResults}}"
+      }
+    }
+  },
+  "paginationStrategy": {
+    "type": "com.unifyapps.connectors.infra.configs.pagination.CursorPaginationConfig",
+    "cursorValueTemplate": "{{ return { \"offset\": (previousCursor?.offset ?: 0) + (rawPayload.limit ?: 100), \"limit\": rawPayload.limit ?: 100 }; }}",
+    "stopConditionTemplate": "{{ response.body.hasMore === false }}",
+    "initCursorValueTemplate": "{{ return { \"offset\": 0, \"limit\": rawPayload.limit ?: 100 }; }}"
+  }
+}

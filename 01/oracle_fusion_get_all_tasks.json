@@ -1,0 +1,162 @@
+{
+  "resource": {
+    "applicationName": "oracle_fusion",
+    "description": "Get all tasks",
+    "input": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "expand": {
+            "type": "string",
+            "title": "Expand",
+            "description": "Include specified child resources in the response payload"
+          },
+          "fields": {
+            "type": "string",
+            "title": "Fields",
+            "description": "Comma-separated list of fields to return"
+          },
+          "finder": {
+            "type": "string",
+            "title": "Finder",
+            "description": "Predefined finder query for retrieving tasks"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "Number of resources to return"
+          },
+          "links": {
+            "type": "string",
+            "title": "Links",
+            "description": "Comma-separated list of link relations to include"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset",
+            "description": "Starting position in the resource collection"
+          },
+          "onlyData": {
+            "type": "boolean",
+            "title": "Only Data",
+            "description": "Whether to include only data in the response (exclude links)"
+          },
+          "orderBy": {
+            "type": "string",
+            "title": "Order By",
+            "description": "Fields to order the collection by (asc/desc)"
+          },
+          "q": {
+            "type": "string",
+            "title": "Query",
+            "description": "Where clause expressions for filtering"
+          },
+          "totalResults": {
+            "type": "boolean",
+            "title": "Total Results",
+            "description": "Whether to include the total row count"
+          }
+        }
+      }
+    },
+    "name": "oracle_fusion_get_all_tasks",
+    "needsAuthentication": true,
+    "output": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "hasMore": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "totalResults": {
+            "type": "integer",
+            "title": "Total Results"
+          },
+          "items": {
+            "type": "array",
+            "title": "Items",
+            "items": {
+              "type": "object",
+              "properties": {
+                "IdentificationKey": {
+                  "type": "string",
+                  "title": "Identification Key"
+                },
+                "ModuleIdentifier": {
+                  "type": "string",
+                  "title": "Module Identifier"
+                },
+                "AdditionalInformation": {
+                  "type": "string",
+                  "title": "Additional Information"
+                },
+                "links": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  },
+                  "title": "Links"
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "title": "Links",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "title": "Get all tasks",
+    "resourceTypes": [
+      "ACTION"
+    ]
+  },
+  "connectorConfig": {
+    "client": {
+      "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
+      "baseUrlTemplate": "{{input.auth.domain}}",
+      "httpMethod": "GET",
+      "pathTemplate": "/hcmRestApi/resources/11.13.18.05/tasks",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": {
+        "expand": "{{rawPayload.expand}}",
+        "fields": "{{rawPayload.fields}}",
+        "finder": "{{rawPayload.finder}}",
+        "limit": "{{rawPayload.limit}}",
+        "links": "{{rawPayload.links}}",
+        "offset": "{{rawPayload.offset}}",
+        "onlyData": "{{rawPayload.onlyData}}",
+        "orderBy": "{{rawPayload.orderBy}}",
+        "q": "{{rawPayload.q}}",
+        "totalResults": "{{rawPayload.totalResults}}"
+      }
+    }
+  },
+  "paginationStrategy": {
+    "type": "com.unifyapps.connectors.infra.configs.pagination.OffsetPaginationConfig",
+    "offsetValueTemplate": "{{ return (previousCursor?.offset || 0) + (rawPayload.limit || 25); }}",
+    "stopConditionTemplate": "{{ !response.body.hasMore }}",
+    "initOffsetValueTemplate": "{{ return 0; }}"
+  }
+}

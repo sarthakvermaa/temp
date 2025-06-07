@@ -1,0 +1,166 @@
+{
+  "resource": {
+    "applicationName": "oracle_fusion",
+    "description": "Get all persons from Oracle Fusion",
+    "input": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "number",
+            "title": "Offset"
+          },
+          "expand": {
+            "type": "string",
+            "title": "Expand"
+          },
+          "fields": {
+            "type": "string",
+            "title": "Fields"
+          },
+          "finder": {
+            "type": "string",
+            "title": "Finder"
+          },
+          "orderBy": {
+            "type": "string",
+            "title": "Order By"
+          },
+          "q": {
+            "type": "string",
+            "title": "Query Filter"
+          },
+          "onlyData": {
+            "type": "boolean",
+            "title": "Only Data"
+          },
+          "totalResults": {
+            "type": "boolean",
+            "title": "Total Results"
+          }
+        }
+      }
+    },
+    "name": "oracle_fusion_get_all_persons",
+    "needsAuthentication": true,
+    "output": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "title": "Items",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Personid": {
+                  "type": "integer",
+                  "title": "Person ID"
+                },
+                "Displayname": {
+                  "type": "string",
+                  "title": "Display Name"
+                },
+                "Emailaddress": {
+                  "type": "string",
+                  "title": "Email Address"
+                },
+                "Firstname": {
+                  "type": "string",
+                  "title": "First Name"
+                },
+                "Lastname": {
+                  "type": "string",
+                  "title": "Last Name"
+                },
+                "Jobtitle": {
+                  "type": "string",
+                  "title": "Job Title"
+                },
+                "Orgunitname": {
+                  "type": "string",
+                  "title": "Organization Unit Name"
+                },
+                "Username": {
+                  "type": "string",
+                  "title": "Username"
+                }
+              }
+            }
+          },
+          "count": {
+            "type": "number",
+            "title": "Count"
+          },
+          "hasMore": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "limit": {
+            "type": "number",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "number",
+            "title": "Offset"
+          },
+          "links": {
+            "type": "array",
+            "title": "Links",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rel": {
+                  "type": "string",
+                  "title": "Rel"
+                },
+                "href": {
+                  "type": "string",
+                  "title": "Href"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "title": "Get all persons",
+    "resourceTypes": [
+      "ACTION"
+    ]
+  },
+  "connectorConfig": {
+    "client": {
+      "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
+      "baseUrlTemplate": "{{input.auth.domain}}",
+      "httpMethod": "GET",
+      "pathTemplate": "/fscmRestApi/resources/11.13.18.05/persons",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": {
+        "limit": "{{if(rawPayload.limit <= 0) { return null; } return rawPayload.limit;}}",
+        "offset": "{{rawPayload.offset}}",
+        "expand": "{{rawPayload.expand}}",
+        "fields": "{{rawPayload.fields}}",
+        "finder": "{{rawPayload.finder}}",
+        "orderBy": "{{rawPayload.orderBy}}",
+        "q": "{{rawPayload.q}}",
+        "onlyData": "{{rawPayload.onlyData}}",
+        "totalResults": "{{rawPayload.totalResults}}"
+      }
+    }
+  },
+  "paginationStrategy": {
+    "type": "com.unifyapps.connectors.infra.configs.pagination.CursorPaginationConfig",
+    "cursorValueTemplate": "{{ return { \"offset\": (previousCursor?.offset ?: 0) + (rawPayload.limit ?: 100), \"limit\": rawPayload.limit ?: 100 }; }}",
+    "stopConditionTemplate": "{{ !response.body.hasMore }}",
+    "initCursorValueTemplate": "{{ return { \"offset\": 0, \"limit\": rawPayload.limit ?: 100 }; }}"
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "resource": {
+    "applicationName": "oracle_fusion",
+    "description": "Get all users",
+    "input": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "type": "string",
+            "title": "Attributes",
+            "description": "Comma-separated list of attribute values to include in the response"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count",
+            "description": "Number of resources to return"
+          },
+          "filter": {
+            "type": "string",
+            "title": "Filter",
+            "description": "Query expression to filter user resources"
+          },
+          "sortBy": {
+            "type": "string",
+            "title": "Sort By",
+            "description": "Attributes to sort the resources by"
+          },
+          "sortOrder": {
+            "type": "string",
+            "title": "Sort Order",
+            "description": "Order of sorting (ascending or descending)"
+          },
+          "startIndex": {
+            "type": "integer",
+            "title": "Start Index",
+            "description": "1-based index for the first result in the response"
+          }
+        }
+      }
+    },
+    "name": "oracle_fusion_get_all_users",
+    "needsAuthentication": true,
+    "output": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "itemsPerPage": {
+            "type": "integer",
+            "title": "Items Per Page"
+          },
+          "startIndex": {
+            "type": "integer",
+            "title": "Start Index"
+          },
+          "Resources": {
+            "title": "Resources",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "title": "User ID"
+                },
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "created": {
+                      "type": "string",
+                      "title": "Created"
+                    },
+                    "lastModified": {
+                      "type": "string",
+                      "title": "Last Modified"
+                    },
+                    "location": {
+                      "type": "string",
+                      "title": "Location"
+                    }
+                  }
+                },
+                "schemas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Schemas"
+                },
+                "userName": {
+                  "type": "string",
+                  "title": "Username"
+                },
+                "name": {
+                  "type": "object",
+                  "properties": {
+                    "familyName": {
+                      "type": "string",
+                      "title": "Family Name"
+                    },
+                    "givenName": {
+                      "type": "string",
+                      "title": "Given Name"
+                    }
+                  }
+                },
+                "displayName": {
+                  "type": "string",
+                  "title": "Display Name"
+                },
+                "emails": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "title": "Email"
+                      },
+                      "type": {
+                        "type": "string",
+                        "title": "Email Type"
+                      },
+                      "primary": {
+                        "type": "boolean",
+                        "title": "Primary Email"
+                      }
+                    }
+                  }
+                },
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "title": "Role ID"
+                      },
+                      "value": {
+                        "type": "string",
+                        "title": "Role Value"
+                      },
+                      "displayName": {
+                        "type": "string",
+                        "title": "Role Display Name"
+                      },
+                      "description": {
+                        "type": "string",
+                        "title": "Role Description"
+                      }
+                    }
+                  }
+                },
+                "active": {
+                  "type": "boolean",
+                  "title": "Active"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "title": "Get all users",
+    "resourceTypes": [
+      "ACTION"
+    ]
+  },
+  "connectorConfig": {
+    "client": {
+      "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
+      "baseUrlTemplate": "{{input.auth.domain}}",
+      "httpMethod": "GET",
+      "pathTemplate": "/hcmRestApi/scim/Users",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": {
+        "attributes": "{{rawPayload.attributes}}",
+        "count": "{{rawPayload.count}}",
+        "filter": "{{rawPayload.filter}}",
+        "sortBy": "{{rawPayload.sortBy}}",
+        "sortOrder": "{{rawPayload.sortOrder}}",
+        "startIndex": "{{rawPayload.startIndex}}"
+      }
+    }
+  },
+  "paginationStrategy": {
+    "type": "com.unifyapps.connectors.infra.configs.pagination.CursorPaginationConfig",
+    "cursorValueTemplate": "{{ return { \"startIndex\": (previousCursor?.startIndex ?: 1) + (rawPayload.count ?: 100), \"count\": rawPayload.count ?: 100 }; }}",
+    "stopConditionTemplate": "{{ response.body.Resources.length === 0 }}",
+    "initCursorValueTemplate": "{{ return { \"startIndex\": 1, \"count\": rawPayload.count ?: 100 }; }}"
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "resource": {
+    "applicationName": "oracle_fusion",
+    "description": "Get all organization tree nodes",
+    "input": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "effectiveDate": {
+            "type": "string",
+            "title": "Effective Date",
+            "description": "Fetch resources effective as of this date (yyyy-MM-dd)"
+          },
+          "expand": {
+            "type": "string",
+            "title": "Expand",
+            "description": "Specify children to include in response"
+          },
+          "fields": {
+            "type": "string",
+            "title": "Fields",
+            "description": "Filter returned fields"
+          },
+          "finder": {
+            "type": "string",
+            "title": "Finder",
+            "description": "Predefined finder for the search"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "Max number of results"
+          },
+          "links": {
+            "type": "string",
+            "title": "Links",
+            "description": "Filter links returned"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset",
+            "description": "Starting position for results"
+          },
+          "onlyData": {
+            "type": "boolean",
+            "title": "Only Data",
+            "description": "Return only data without links"
+          },
+          "orderBy": {
+            "type": "string",
+            "title": "Order By",
+            "description": "Order results by these fields"
+          },
+          "q": {
+            "type": "string",
+            "title": "Query Filter",
+            "description": "Where clause filter expressions"
+          },
+          "totalResults": {
+            "type": "boolean",
+            "title": "Total Results",
+            "description": "Include estimated total results count"
+          }
+        }
+      }
+    },
+    "name": "oracle_fusion_get_all_organization_tree_nodes",
+    "needsAuthentication": true,
+    "output": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "title": "Items",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "OrganizationId": {
+                  "type": "integer",
+                  "title": "Organization ID"
+                },
+                "EffectiveStartDate": {
+                  "type": "string",
+                  "format": "date",
+                  "title": "Effective Start Date"
+                },
+                "EffectiveEndDate": {
+                  "type": "string",
+                  "format": "date",
+                  "title": "Effective End Date"
+                },
+                "OrganizationName": {
+                  "type": "string",
+                  "title": "Organization Name"
+                },
+                "links": {
+                  "type": "array",
+                  "title": "Links",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "hasMore": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "links": {
+            "type": "array",
+            "title": "Links",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rel": {
+                  "type": "string",
+                  "title": "Relation"
+                },
+                "href": {
+                  "type": "string",
+                  "title": "Href"
+                }
+              }
+            }
+          },
+          "totalResults": {
+            "type": "integer",
+            "title": "Total Results"
+          }
+        }
+      }
+    },
+    "title": "Get all organization tree nodes",
+    "resourceTypes": [
+      "ACTION"
+    ]
+  },
+  "connectorConfig": {
+    "client": {
+      "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
+      "baseUrlTemplate": "{{input.auth.domain}}",
+      "httpMethod": "GET",
+      "pathTemplate": "/hcmRestApi/resources/11.13.18.05/organizationTreeNodesLOV",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": {
+        "effectiveDate": "{{rawPayload.effectiveDate}}",
+        "expand": "{{rawPayload.expand}}",
+        "fields": "{{rawPayload.fields}}",
+        "finder": "{{rawPayload.finder}}",
+        "limit": "{{rawPayload.limit}}",
+        "links": "{{rawPayload.links}}",
+        "offset": "{{rawPayload.offset}}",
+        "onlyData": "{{rawPayload.onlyData}}",
+        "orderBy": "{{rawPayload.orderBy}}",
+        "q": "{{rawPayload.q}}",
+        "totalResults": "{{rawPayload.totalResults}}"
+      }
+    }
+  },
+  "paginationStrategy": {
+    "type": "com.unifyapps.connectors.infra.configs.pagination.CursorPaginationConfig",
+    "cursorValueTemplate": "{{ return { \"offset\": (previousCursor?.offset ?: 0) + (rawPayload.limit ?: 100), \"limit\": rawPayload.limit ?: 100 }; }}",
+    "stopConditionTemplate": "{{ !response.body.hasMore }}",
+    "initCursorValueTemplate": "{{ return { \"offset\": 0, \"limit\": rawPayload.limit ?: 100 }; }}"
+  }
+}
