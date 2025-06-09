@@ -1,50 +1,57 @@
 {
   "resource": {
     "applicationName": "oracle_fusion",
-    "description": "Get all organization tree nodes in Oracle Fusion",
+    "description": "Get all suppliers in Oracle Fusion",
     "input": {
       "type": "SCHEMA",
       "schema": {
         "type": "object",
         "properties": {
-          "effectiveDate": {
-            "type": "string"
-          },
           "expand": {
-            "type": "string"
+            "type": "string",
+            "description": "Specify children to include in the payload."
           },
           "fields": {
-            "type": "string"
+            "type": "string",
+            "description": "Filter the resource fields returned."
           },
           "finder": {
-            "type": "string"
+            "type": "string",
+            "description": "Use a predefined finder to search the collection."
           },
           "limit": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Restrict number of resources returned."
           },
           "offset": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Starting position of the resource collection."
           },
           "onlyData": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Filter to only data without links."
           },
           "orderBy": {
-            "type": "string"
+            "type": "string",
+            "description": "Order collection by specified fields."
           },
           "q": {
-            "type": "string"
+            "type": "string",
+            "description": "Where clause query expressions."
           },
           "links": {
-            "type": "string"
+            "type": "string",
+            "description": "Show only certain links."
           },
           "totalResults": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Include estimated total row count."
           }
         },
         "required": []
       }
     },
-    "name": "oracle_fusion_get_all_organization_tree_nodes",
+    "name": "oracle_fusion_get_all_suppliers",
     "needsAuthentication": true,
     "output": {
       "type": "SCHEMA",
@@ -53,52 +60,40 @@
         "properties": {
           "totalResults": {
             "type": "integer",
-            "title": "Total Results"
+            "description": "Estimated row count if requested."
           },
           "offset": {
             "type": "integer",
-            "title": "Offset"
+            "description": "Current page offset."
           },
           "count": {
             "type": "integer",
-            "title": "Count"
+            "description": "Number of resources returned."
           },
           "hasMore": {
             "type": "boolean",
-            "title": "Has More"
+            "description": "Whether more resources are available."
           },
           "limit": {
             "type": "integer",
-            "title": "Limit"
+            "description": "Page size used by the server."
           },
           "links": {
             "type": "array",
-            "title": "Links",
+            "description": "Link relations for the resource instance.",
             "items": {
               "type": "object",
               "properties": {
-                "rel": {
-                  "type": "string",
-                  "title": "Rel"
-                },
-                "href": {
-                  "type": "string",
-                  "title": "Href"
-                },
-                "name": {
-                  "type": "string",
-                  "title": "Name"
-                },
-                "kind": {
-                  "type": "string",
-                  "title": "Kind"
-                }
+                "rel": { "type": "string" },
+                "href": { "type": "string" },
+                "name": { "type": "string" },
+                "kind": { "type": "string" }
               }
             }
           },
           "items": {
             "type": "array",
-            "title": "Items",
+            "description": "List of supplier items.",
             "items": {
               "type": "object"
             }
@@ -113,7 +108,7 @@
         ]
       }
     },
-    "title": "Get all organization tree nodes",
+    "title": "Get all suppliers",
     "resourceTypes": [
       "ACTION"
     ]
@@ -123,12 +118,11 @@
       "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
       "baseUrlTemplate": "{{input.auth.domain}}",
       "httpMethod": "GET",
-      "pathTemplate": "/hcmRestApi/resources/11.13.18.05/organizationTreeNodesLOV",
+      "pathTemplate": "/fscmRestApi/resources/11.13.18.05/suppliers",
       "headers": {
         "Content-Type": "application/json"
       },
       "queryParams": {
-        "effectiveDate": "{{ rawPayload.effectiveDate }}",
         "expand": "{{ rawPayload.expand }}",
         "fields": "{{ rawPayload.fields }}",
         "finder": "{{ rawPayload.finder }}",

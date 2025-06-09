@@ -1,0 +1,115 @@
+{
+  "resource": {
+    "applicationName": "oracle_fusion",
+    "description": "Get all advanced controls in Oracle Fusion",
+    "input": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "number" },
+          "offset": { "type": "number" },
+          "totalResults": { "type": "boolean" },
+          "expand": { "type": "string" },
+          "fields": { "type": "string" },
+          "finder": { "type": "string" },
+          "links": { "type": "string" },
+          "onlyData": { "type": "boolean" },
+          "orderBy": { "type": "string" },
+          "q": { "type": "string" }
+        },
+        "required": []
+      }
+    },
+    "name": "oracle_fusion_get_all_advanced_controls",
+    "needsAuthentication": true,
+    "output": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "totalResults": { "type": "integer", "title": "Total Results" },
+          "offset": { "type": "integer", "title": "Offset" },
+          "count": { "type": "integer", "title": "Count" },
+          "hasMore": { "type": "boolean", "title": "Has More" },
+          "limit": { "type": "integer", "title": "Limit" },
+          "links": {
+            "type": "array",
+            "title": "Links",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rel": { "type": "string", "title": "Rel" },
+                "href": { "type": "string", "title": "Href" },
+                "name": { "type": "string", "title": "Name" },
+                "kind": { "type": "string", "title": "Kind" }
+              }
+            }
+          },
+          "items": {
+            "type": "array",
+            "title": "Items",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": { "type": "integer", "title": "Advanced Control ID" },
+                "Name": { "type": "string", "title": "Name" },
+                "Description": { "type": "string", "title": "Description" },
+                "EnforcementType": { "type": "number", "title": "Enforcement Type" },
+                "Status": { "type": "string", "title": "Status" },
+                "StatusId": { "type": "number", "title": "Status ID" },
+                "Type": { "type": "number", "title": "Risk Type" },
+                "CreationDate": { "type": "string", "title": "Creation Date" },
+                "CreatedBy": { "type": "string", "title": "Created By" },
+                "LastUpdateDate": { "type": "string", "title": "Last Update Date" },
+                "LastUpdatedBy": { "type": "string", "title": "Last Updated By" },
+                "LastRunDate": { "type": "string", "title": "Last Run Date" },
+                "LatestJobId": { "type": "integer", "title": "Latest Job ID" },
+                "ScheduledBy": { "type": "string", "title": "Scheduled By" },
+                "StateCode": { "type": "string", "title": "State Code" }
+              }
+            }
+          }
+        },
+        "required": [
+          "count",
+          "hasMore",
+          "limit",
+          "links",
+          "offset"
+        ]
+      }
+    },
+    "title": "Get all advanced controls",
+    "resourceTypes": [ "ACTION" ]
+  },
+  "connectorConfig": {
+    "client": {
+      "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
+      "baseUrlTemplate": "{{input.auth.domain}}",
+      "httpMethod": "GET",
+      "pathTemplate": "/fscmRestApi/resources/11.13.18.05/advancedControls",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": {
+        "limit": "{{ if(rawPayload.limit <= 0){ return null; } return rawPayload.limit; }}",
+        "offset": "{{ rawPayload.offset ?: 0 }}",
+        "totalResults": "{{ rawPayload.totalResults }}",
+        "expand": "{{ rawPayload.expand }}",
+        "fields": "{{ rawPayload.fields }}",
+        "finder": "{{ rawPayload.finder }}",
+        "links": "{{ rawPayload.links }}",
+        "onlyData": "{{ rawPayload.onlyData }}",
+        "orderBy": "{{ rawPayload.orderBy }}",
+        "q": "{{ rawPayload.q }}"
+      }
+    }
+  },
+  "paginationStrategy": {
+    "type": "com.unifyapps.connectors.infra.configs.pagination.CursorPaginationConfig",
+    "cursorValueTemplate": "{{ return { \"offset\": (previousCursor?.offset ?: 0) + (rawPayload.limit ?: 100), \"limit\": rawPayload.limit ?: 100 }; }}",
+    "stopConditionTemplate": "{{ !response.body.hasMore }}",
+    "initCursorValueTemplate": "{{ return { \"offset\": 0, \"limit\": rawPayload.limit ?: 100 }; }}"
+  }
+}

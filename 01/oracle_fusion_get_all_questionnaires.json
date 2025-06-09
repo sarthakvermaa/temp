@@ -1,7 +1,7 @@
 {
   "resource": {
     "applicationName": "oracle_fusion",
-    "description": "Get all questionnaires",
+    "description": "Get all questionnaires in Oracle Fusion",
     "input": {
       "type": "SCHEMA",
       "schema": {
@@ -9,50 +9,50 @@
         "properties": {
           "effectiveDate": {
             "type": "string",
-            "title": "Effective Date",
-            "description": "Effective date for fetching resources (format: yyyy-MM-dd)"
+            "description": "Fetch resources effective dated as of the specified start date (yyyy-MM-dd)."
           },
           "expand": {
             "type": "string",
-            "title": "Expand",
-            "description": "Comma-separated list of child resources to expand"
+            "description": "Specify children to include in the payload."
           },
           "fields": {
             "type": "string",
-            "title": "Fields",
-            "description": "Comma-separated list of fields to include in the response"
+            "description": "Filter the resource fields returned."
           },
           "finder": {
             "type": "string",
-            "title": "Finder",
-            "description": "Predefined finder to search the collection"
+            "description": "Use a predefined finder to search the collection."
           },
           "limit": {
             "type": "integer",
-            "title": "Limit",
-            "description": "Number of resources to return"
+            "description": "Restrict number of resources returned."
           },
           "offset": {
             "type": "integer",
-            "title": "Offset",
-            "description": "Starting position of the resource collection"
+            "description": "Starting position of the resource collection."
+          },
+          "onlyData": {
+            "type": "boolean",
+            "description": "Filter to only data without links."
           },
           "orderBy": {
             "type": "string",
-            "title": "Order By",
-            "description": "Fields to order the resources by, with optional asc/desc"
+            "description": "Order collection by specified fields."
           },
           "q": {
             "type": "string",
-            "title": "Filter Query",
-            "description": "Where clause expressions to filter the collection"
+            "description": "Where clause query expressions."
+          },
+          "links": {
+            "type": "string",
+            "description": "Show only certain links."
           },
           "totalResults": {
             "type": "boolean",
-            "title": "Total Results",
-            "description": "Include estimated row count if true"
+            "description": "Include estimated total row count."
           }
-        }
+        },
+        "required": []
       }
     },
     "name": "oracle_fusion_get_all_questionnaires",
@@ -64,70 +64,60 @@
         "properties": {
           "totalResults": {
             "type": "integer",
-            "title": "Total Results"
+            "description": "Estimated row count if requested."
           },
           "offset": {
             "type": "integer",
-            "title": "Offset"
+            "description": "Current page offset."
           },
           "count": {
             "type": "integer",
-            "title": "Count"
+            "description": "Number of resources returned."
           },
           "hasMore": {
             "type": "boolean",
-            "title": "Has More"
+            "description": "Whether more resources are available."
           },
           "limit": {
             "type": "integer",
-            "title": "Limit"
+            "description": "Page size used by the server."
           },
-          "items": {
-            "title": "Questionnaires",
+          "links": {
             "type": "array",
+            "description": "Link relations for the resource instance.",
             "items": {
               "type": "object",
               "properties": {
-                "QuestionnaireId": {
-                  "type": "integer",
-                  "title": "Questionnaire ID"
+                "rel": {
+                  "type": "string"
                 },
-                "QuestionnaireName": {
-                  "type": "string",
-                  "title": "Questionnaire Name"
+                "href": {
+                  "type": "string"
                 },
-                "QuestionnaireCode": {
-                  "type": "string",
-                  "title": "Questionnaire Code"
+                "name": {
+                  "type": "string"
                 },
-                "Status": {
-                  "type": "string",
-                  "title": "Status"
-                },
-                "LatestVersionFlag": {
-                  "type": "boolean",
-                  "title": "Is Latest Version"
-                },
-                "CreationDate": {
-                  "type": "string",
-                  "title": "Creation Date"
-                },
-                "LastUpdateDate": {
-                  "type": "string",
-                  "title": "Last Update Date"
-                },
-                "FolderName": {
-                  "type": "string",
-                  "title": "Folder Name"
-                },
-                "SubscriberName": {
-                  "type": "string",
-                  "title": "Subscriber Name"
+                "kind": {
+                  "type": "string"
                 }
               }
             }
+          },
+          "items": {
+            "type": "array",
+            "description": "List of questionnaire items.",
+            "items": {
+              "type": "object"
+            }
           }
-        }
+        },
+        "required": [
+          "count",
+          "hasMore",
+          "limit",
+          "links",
+          "offset"
+        ]
       }
     },
     "title": "Get all questionnaires",
@@ -145,22 +135,24 @@
         "Content-Type": "application/json"
       },
       "queryParams": {
-        "effectiveDate": "{{rawPayload.effectiveDate}}",
-        "expand": "{{rawPayload.expand}}",
-        "fields": "{{rawPayload.fields}}",
-        "finder": "{{rawPayload.finder}}",
-        "limit": "{{rawPayload.limit}}",
-        "offset": "{{rawPayload.offset}}",
-        "orderBy": "{{rawPayload.orderBy}}",
-        "q": "{{rawPayload.q}}",
-        "totalResults": "{{rawPayload.totalResults}}"
+        "effectiveDate": "{{ rawPayload.effectiveDate }}",
+        "expand": "{{ rawPayload.expand }}",
+        "fields": "{{ rawPayload.fields }}",
+        "finder": "{{ rawPayload.finder }}",
+        "limit": "{{ if(rawPayload.limit <= 0){ return null; } return rawPayload.limit; }}",
+        "offset": "{{ rawPayload.offset ?: 0 }}",
+        "onlyData": "{{ rawPayload.onlyData }}",
+        "orderBy": "{{ rawPayload.orderBy }}",
+        "q": "{{ rawPayload.q }}",
+        "links": "{{ rawPayload.links }}",
+        "totalResults": "{{ rawPayload.totalResults }}"
       }
     }
   },
   "paginationStrategy": {
     "type": "com.unifyapps.connectors.infra.configs.pagination.CursorPaginationConfig",
     "cursorValueTemplate": "{{ return { \"offset\": (previousCursor?.offset ?: 0) + (rawPayload.limit ?: 100), \"limit\": rawPayload.limit ?: 100 }; }}",
-    "stopConditionTemplate": "{{ response.body.hasMore === false }}",
+    "stopConditionTemplate": "{{ !response.body.hasMore }}",
     "initCursorValueTemplate": "{{ return { \"offset\": 0, \"limit\": rawPayload.limit ?: 100 }; }}"
   }
 }

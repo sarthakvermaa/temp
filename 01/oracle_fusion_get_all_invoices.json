@@ -1,7 +1,7 @@
 {
   "resource": {
     "applicationName": "oracle_fusion",
-    "description": "Get all organization tree nodes in Oracle Fusion",
+    "description": "Get all invoices in Oracle Fusion",
     "input": {
       "type": "SCHEMA",
       "schema": {
@@ -39,12 +39,15 @@
           },
           "totalResults": {
             "type": "boolean"
+          },
+          "effectiveOf": {
+            "type": "string"
           }
         },
         "required": []
       }
     },
-    "name": "oracle_fusion_get_all_organization_tree_nodes",
+    "name": "oracle_fusion_get_all_invoices",
     "needsAuthentication": true,
     "output": {
       "type": "SCHEMA",
@@ -113,7 +116,7 @@
         ]
       }
     },
-    "title": "Get all organization tree nodes",
+    "title": "Get all invoices",
     "resourceTypes": [
       "ACTION"
     ]
@@ -123,9 +126,10 @@
       "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
       "baseUrlTemplate": "{{input.auth.domain}}",
       "httpMethod": "GET",
-      "pathTemplate": "/hcmRestApi/resources/11.13.18.05/organizationTreeNodesLOV",
+      "pathTemplate": "/fscmRestApi/resources/11.13.18.05/invoices",
       "headers": {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Effective-Of": "{{ rawPayload.effectiveOf }}"
       },
       "queryParams": {
         "effectiveDate": "{{ rawPayload.effectiveDate }}",

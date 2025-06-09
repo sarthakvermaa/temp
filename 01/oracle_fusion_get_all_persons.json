@@ -1,49 +1,44 @@
 {
   "resource": {
     "applicationName": "oracle_fusion",
-    "description": "Get all persons from Oracle Fusion",
+    "description": "Get all persons in Oracle Fusion",
     "input": {
       "type": "SCHEMA",
       "schema": {
         "type": "object",
         "properties": {
-          "limit": {
-            "type": "number",
-            "title": "Limit"
-          },
-          "offset": {
-            "type": "number",
-            "title": "Offset"
-          },
           "expand": {
-            "type": "string",
-            "title": "Expand"
+            "type": "string"
           },
           "fields": {
-            "type": "string",
-            "title": "Fields"
+            "type": "string"
           },
           "finder": {
-            "type": "string",
-            "title": "Finder"
+            "type": "string"
           },
-          "orderBy": {
-            "type": "string",
-            "title": "Order By"
+          "limit": {
+            "type": "integer"
           },
-          "q": {
-            "type": "string",
-            "title": "Query Filter"
+          "offset": {
+            "type": "integer"
           },
           "onlyData": {
-            "type": "boolean",
-            "title": "Only Data"
+            "type": "boolean"
+          },
+          "orderBy": {
+            "type": "string"
+          },
+          "q": {
+            "type": "string"
+          },
+          "links": {
+            "type": "string"
           },
           "totalResults": {
-            "type": "boolean",
-            "title": "Total Results"
+            "type": "boolean"
           }
-        }
+        },
+        "required": []
       }
     },
     "name": "oracle_fusion_get_all_persons",
@@ -53,49 +48,16 @@
       "schema": {
         "type": "object",
         "properties": {
-          "items": {
-            "title": "Items",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "Personid": {
-                  "type": "integer",
-                  "title": "Person ID"
-                },
-                "Displayname": {
-                  "type": "string",
-                  "title": "Display Name"
-                },
-                "Emailaddress": {
-                  "type": "string",
-                  "title": "Email Address"
-                },
-                "Firstname": {
-                  "type": "string",
-                  "title": "First Name"
-                },
-                "Lastname": {
-                  "type": "string",
-                  "title": "Last Name"
-                },
-                "Jobtitle": {
-                  "type": "string",
-                  "title": "Job Title"
-                },
-                "Orgunitname": {
-                  "type": "string",
-                  "title": "Organization Unit Name"
-                },
-                "Username": {
-                  "type": "string",
-                  "title": "Username"
-                }
-              }
-            }
+          "totalResults": {
+            "type": "integer",
+            "title": "Total Results"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
           },
           "count": {
-            "type": "number",
+            "type": "integer",
             "title": "Count"
           },
           "hasMore": {
@@ -103,12 +65,8 @@
             "title": "Has More"
           },
           "limit": {
-            "type": "number",
+            "type": "integer",
             "title": "Limit"
-          },
-          "offset": {
-            "type": "number",
-            "title": "Offset"
           },
           "links": {
             "type": "array",
@@ -123,11 +81,33 @@
                 "href": {
                   "type": "string",
                   "title": "Href"
+                },
+                "name": {
+                  "type": "string",
+                  "title": "Name"
+                },
+                "kind": {
+                  "type": "string",
+                  "title": "Kind"
                 }
               }
             }
+          },
+          "items": {
+            "type": "array",
+            "title": "Items",
+            "items": {
+              "type": "object"
+            }
           }
-        }
+        },
+        "required": [
+          "count",
+          "hasMore",
+          "limit",
+          "links",
+          "offset"
+        ]
       }
     },
     "title": "Get all persons",
@@ -145,15 +125,16 @@
         "Content-Type": "application/json"
       },
       "queryParams": {
-        "limit": "{{if(rawPayload.limit <= 0) { return null; } return rawPayload.limit;}}",
-        "offset": "{{rawPayload.offset}}",
-        "expand": "{{rawPayload.expand}}",
-        "fields": "{{rawPayload.fields}}",
-        "finder": "{{rawPayload.finder}}",
-        "orderBy": "{{rawPayload.orderBy}}",
-        "q": "{{rawPayload.q}}",
-        "onlyData": "{{rawPayload.onlyData}}",
-        "totalResults": "{{rawPayload.totalResults}}"
+        "expand": "{{ rawPayload.expand }}",
+        "fields": "{{ rawPayload.fields }}",
+        "finder": "{{ rawPayload.finder }}",
+        "limit": "{{ if(rawPayload.limit <= 0){ return null; } return rawPayload.limit; }}",
+        "offset": "{{ rawPayload.offset ?: 0 }}",
+        "onlyData": "{{ rawPayload.onlyData }}",
+        "orderBy": "{{ rawPayload.orderBy }}",
+        "q": "{{ rawPayload.q }}",
+        "links": "{{ rawPayload.links }}",
+        "totalResults": "{{ rawPayload.totalResults }}"
       }
     }
   },

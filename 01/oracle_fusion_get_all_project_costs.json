@@ -1,0 +1,150 @@
+{
+  "resource": {
+    "applicationName": "oracle_fusion",
+    "description": "Get all project costs",
+    "input": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "effectiveDate": {
+            "type": "string",
+            "description": "Fetch resources effective dated as of the specified start date (yyyy-MM-dd format)."
+          },
+          "expand": {
+            "type": "string",
+            "description": "Include specified children in the resource payload (e.g. all, Employees, Employees.Managers)."
+          },
+          "fields": {
+            "type": "string",
+            "description": "Filter the resource fields to return only specified attributes."
+          },
+          "finder": {
+            "type": "string",
+            "description": "Predefined finder to search the collection. Format: ?finder=<finderName>;<var>=<value>"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Restrict the number of resources returned."
+          },
+          "links": {
+            "type": "string",
+            "description": "Show only certain links while accessing the resource (comma-separated list)."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Starting position of the resource collection."
+          },
+          "onlyData": {
+            "type": "boolean",
+            "description": "Filter payload to contain only data (no links)."
+          },
+          "orderBy": {
+            "type": "string",
+            "description": "Order the resource collection by specified fields (comma-separated)."
+          },
+          "q": {
+            "type": "string",
+            "description": "Query expressions to filter the resource collection."
+          },
+          "totalResults": {
+            "type": "boolean",
+            "description": "Include estimated row count in the response if true."
+          }
+        },
+        "required": []
+      }
+    },
+    "name": "oracle_fusion_get_all_project_costs",
+    "needsAuthentication": true,
+    "output": {
+      "type": "SCHEMA",
+      "schema": {
+        "type": "object",
+        "required": [
+          "count",
+          "hasMore",
+          "limit",
+          "links",
+          "offset"
+        ],
+        "properties": {
+          "totalResults": {
+            "type": "integer",
+            "description": "Estimated row count if totalResults=true."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Offset value used in the current page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of resources returned in the current range."
+          },
+          "hasMore": {
+            "type": "boolean",
+            "description": "Indicates if more resources are available on the server."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The actual paging size used by the server."
+          },
+          "links": {
+            "type": "array",
+            "description": "Link relations associated with the resource instance.",
+            "items": {
+              "type": "object"
+            }
+          },
+          "items": {
+            "type": "array",
+            "description": "The items in the collection.",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "title": "Get all project costs",
+    "resourceTypes": [
+      "ACTION"
+    ]
+  },
+  "connectorConfig": {
+    "client": {
+      "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
+      "baseUrlTemplate": "{{input.auth.domain}}",
+      "httpMethod": "GET",
+      "pathTemplate": "/fscmRestApi/resources/11.13.18.05/projectCosts",
+      "headers": {
+        "Content-Type": "application/json",
+        "Effective-Of": "{{ rawPayload.effectiveOf }}",
+        "Metadata-Context": "{{ rawPayload.metadataContext }}",
+        "REST-Framework-Version": "{{ rawPayload.restFrameworkVersion }}"
+      },
+      "queryParams": {
+        "effectiveDate": "{{ rawPayload.effectiveDate }}",
+        "expand": "{{ rawPayload.expand }}",
+        "fields": "{{ rawPayload.fields }}",
+        "finder": "{{ rawPayload.finder }}",
+        "limit": "{{ rawPayload.limit }}",
+        "links": "{{ rawPayload.links }}",
+        "offset": "{{ rawPayload.offset }}",
+        "onlyData": "{{ rawPayload.onlyData }}",
+        "orderBy": "{{ rawPayload.orderBy }}",
+        "q": "{{ rawPayload.q }}",
+        "totalResults": "{{ rawPayload.totalResults }}"
+      }
+    }
+  },
+  "paginationStrategy": {
+    "type": "com.unifyapps.connectors.infra.configs.pagination.OffsetLimitPaginationConfig",
+    "limitParam": "limit",
+    "offsetParam": "offset",
+    "limitParamTemplate": "{{ rawPayload.limit ?: 100 }}",
+    "offsetParamTemplate": "{{ previousCursor?.offset ? previousCursor.offset + (rawPayload.limit ?: 100) : 0 }}",
+    "stopConditionTemplate": "{{ !response.body.items || response.body.items.length < (rawPayload.limit ?: 100) }}",
+    "initCursorValueTemplate": "{{ return { \"offset\": 0, \"limit\": rawPayload.limit ?: 100 }; }}"
+  }
+}

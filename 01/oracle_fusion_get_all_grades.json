@@ -1,68 +1,47 @@
 {
   "resource": {
     "applicationName": "oracle_fusion",
-    "description": "Get all grades",
+    "description": "Get all grades in Oracle Fusion",
     "input": {
       "type": "SCHEMA",
       "schema": {
         "type": "object",
         "properties": {
           "effectiveDate": {
-            "type": "string",
-            "title": "Effective Date",
-            "description": "Fetch grades effective as of this date (yyyy-MM-dd)"
+            "type": "string"
           },
           "expand": {
-            "type": "string",
-            "title": "Expand",
-            "description": "Specify children to include in response"
+            "type": "string"
           },
           "fields": {
-            "type": "string",
-            "title": "Fields",
-            "description": "Filter returned fields"
+            "type": "string"
           },
           "finder": {
-            "type": "string",
-            "title": "Finder",
-            "description": "Predefined finder for the search"
+            "type": "string"
           },
           "limit": {
-            "type": "integer",
-            "title": "Limit",
-            "description": "Max number of results"
-          },
-          "links": {
-            "type": "string",
-            "title": "Links",
-            "description": "Filter links returned"
+            "type": "integer"
           },
           "offset": {
-            "type": "integer",
-            "title": "Offset",
-            "description": "Starting position for results"
+            "type": "integer"
           },
           "onlyData": {
-            "type": "boolean",
-            "title": "Only Data",
-            "description": "Return only data without links"
+            "type": "boolean"
           },
           "orderBy": {
-            "type": "string",
-            "title": "Order By",
-            "description": "Order results by these fields"
+            "type": "string"
           },
           "q": {
-            "type": "string",
-            "title": "Query Filter",
-            "description": "Where clause filter expressions"
+            "type": "string"
+          },
+          "links": {
+            "type": "string"
           },
           "totalResults": {
-            "type": "boolean",
-            "title": "Total Results",
-            "description": "Include estimated total results count"
+            "type": "boolean"
           }
-        }
+        },
+        "required": []
       }
     },
     "name": "oracle_fusion_get_all_grades",
@@ -72,59 +51,13 @@
       "schema": {
         "type": "object",
         "properties": {
-          "items": {
-            "title": "Items",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "GradeId": {
-                  "type": "integer",
-                  "title": "Grade ID"
-                },
-                "EffectiveStartDate": {
-                  "type": "string",
-                  "format": "date",
-                  "title": "Effective Start Date"
-                },
-                "EffectiveEndDate": {
-                  "type": "string",
-                  "format": "date",
-                  "title": "Effective End Date"
-                },
-                "SetId": {
-                  "type": "integer",
-                  "title": "Set ID"
-                },
-                "GradeName": {
-                  "type": "string",
-                  "title": "Grade Name"
-                },
-                "GradeCode": {
-                  "type": "string",
-                  "title": "Grade Code"
-                },
-                "ActiveStatus": {
-                  "type": "string",
-                  "title": "Active Status"
-                },
-                "CreationDate": {
-                  "type": "string",
-                  "title": "Creation Date"
-                },
-                "LastUpdateDate": {
-                  "type": "string",
-                  "title": "Last Update Date"
-                },
-                "links": {
-                  "type": "array",
-                  "title": "Links",
-                  "items": {
-                    "type": "integer"
-                  }
-                }
-              }
-            }
+          "totalResults": {
+            "type": "integer",
+            "title": "Total Results"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
           },
           "count": {
             "type": "integer",
@@ -138,10 +71,6 @@
             "type": "integer",
             "title": "Limit"
           },
-          "offset": {
-            "type": "integer",
-            "title": "Offset"
-          },
           "links": {
             "type": "array",
             "title": "Links",
@@ -150,20 +79,38 @@
               "properties": {
                 "rel": {
                   "type": "string",
-                  "title": "Relation"
+                  "title": "Rel"
                 },
                 "href": {
                   "type": "string",
                   "title": "Href"
+                },
+                "name": {
+                  "type": "string",
+                  "title": "Name"
+                },
+                "kind": {
+                  "type": "string",
+                  "title": "Kind"
                 }
               }
             }
           },
-          "totalResults": {
-            "type": "integer",
-            "title": "Total Results"
+          "items": {
+            "type": "array",
+            "title": "Items",
+            "items": {
+              "type": "object"
+            }
           }
-        }
+        },
+        "required": [
+          "count",
+          "hasMore",
+          "limit",
+          "links",
+          "offset"
+        ]
       }
     },
     "title": "Get all grades",
@@ -181,17 +128,17 @@
         "Content-Type": "application/json"
       },
       "queryParams": {
-        "effectiveDate": "{{rawPayload.effectiveDate}}",
-        "expand": "{{rawPayload.expand}}",
-        "fields": "{{rawPayload.fields}}",
-        "finder": "{{rawPayload.finder}}",
-        "limit": "{{rawPayload.limit}}",
-        "links": "{{rawPayload.links}}",
-        "offset": "{{rawPayload.offset}}",
-        "onlyData": "{{rawPayload.onlyData}}",
-        "orderBy": "{{rawPayload.orderBy}}",
-        "q": "{{rawPayload.q}}",
-        "totalResults": "{{rawPayload.totalResults}}"
+        "effectiveDate": "{{ rawPayload.effectiveDate }}",
+        "expand": "{{ rawPayload.expand }}",
+        "fields": "{{ rawPayload.fields }}",
+        "finder": "{{ rawPayload.finder }}",
+        "limit": "{{ if(rawPayload.limit <= 0){ return null; } return rawPayload.limit; }}",
+        "offset": "{{ rawPayload.offset ?: 0 }}",
+        "onlyData": "{{ rawPayload.onlyData }}",
+        "orderBy": "{{ rawPayload.orderBy }}",
+        "q": "{{ rawPayload.q }}",
+        "links": "{{ rawPayload.links }}",
+        "totalResults": "{{ rawPayload.totalResults }}"
       }
     }
   },

@@ -1,7 +1,7 @@
 {
   "resource": {
     "applicationName": "oracle_fusion",
-    "description": "Get all tasks",
+    "description": "Get all tasks in Oracle Fusion",
     "input": {
       "type": "SCHEMA",
       "schema": {
@@ -9,55 +9,46 @@
         "properties": {
           "expand": {
             "type": "string",
-            "title": "Expand",
-            "description": "Include specified child resources in the response payload"
+            "description": "Specify children to include in the payload. Example: Employees,Employees.Managers"
           },
           "fields": {
             "type": "string",
-            "title": "Fields",
-            "description": "Comma-separated list of fields to return"
+            "description": "Filter the resource fields returned. Cannot be combined with expand."
           },
           "finder": {
             "type": "string",
-            "title": "Finder",
-            "description": "Predefined finder query for retrieving tasks"
+            "description": "Use a predefined finder to search the collection. Example: PrimaryKey;IdentificationKey=XYZ"
           },
           "limit": {
             "type": "integer",
-            "title": "Limit",
-            "description": "Number of resources to return"
-          },
-          "links": {
-            "type": "string",
-            "title": "Links",
-            "description": "Comma-separated list of link relations to include"
+            "description": "Restrict number of resources returned."
           },
           "offset": {
             "type": "integer",
-            "title": "Offset",
-            "description": "Starting position in the resource collection"
+            "description": "Starting position of the resource collection."
           },
           "onlyData": {
             "type": "boolean",
-            "title": "Only Data",
-            "description": "Whether to include only data in the response (exclude links)"
+            "description": "Filter to only data without links."
           },
           "orderBy": {
             "type": "string",
-            "title": "Order By",
-            "description": "Fields to order the collection by (asc/desc)"
+            "description": "Order collection by specified fields. Example: field1:asc,field2:desc"
           },
           "q": {
             "type": "string",
-            "title": "Query",
-            "description": "Where clause expressions for filtering"
+            "description": "Where clause query expressions. Example: Deptno>=10;Loc!=NY"
+          },
+          "links": {
+            "type": "string",
+            "description": "Show only certain links, comma separated. Example: self,canonical"
           },
           "totalResults": {
             "type": "boolean",
-            "title": "Total Results",
-            "description": "Whether to include the total row count"
+            "description": "Include estimated total row count."
           }
-        }
+        },
+        "required": []
       }
     },
     "name": "oracle_fusion_get_all_tasks",
@@ -67,62 +58,54 @@
       "schema": {
         "type": "object",
         "properties": {
-          "count": {
+          "totalResults": {
             "type": "integer",
-            "title": "Count"
-          },
-          "hasMore": {
-            "type": "boolean",
-            "title": "Has More"
-          },
-          "limit": {
-            "type": "integer",
-            "title": "Limit"
+            "description": "Estimated row count if requested."
           },
           "offset": {
             "type": "integer",
-            "title": "Offset"
+            "description": "Current page offset."
           },
-          "totalResults": {
+          "count": {
             "type": "integer",
-            "title": "Total Results"
+            "description": "Number of resources returned."
           },
-          "items": {
-            "type": "array",
-            "title": "Items",
-            "items": {
-              "type": "object",
-              "properties": {
-                "IdentificationKey": {
-                  "type": "string",
-                  "title": "Identification Key"
-                },
-                "ModuleIdentifier": {
-                  "type": "string",
-                  "title": "Module Identifier"
-                },
-                "AdditionalInformation": {
-                  "type": "string",
-                  "title": "Additional Information"
-                },
-                "links": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  },
-                  "title": "Links"
-                }
-              }
-            }
+          "hasMore": {
+            "type": "boolean",
+            "description": "Whether more resources are available."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Page size used by the server."
           },
           "links": {
             "type": "array",
-            "title": "Links",
+            "description": "Link relations for the resource instance.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rel": { "type": "string" },
+                "href": { "type": "string" },
+                "name": { "type": "string" },
+                "kind": { "type": "string" }
+              }
+            }
+          },
+          "items": {
+            "type": "array",
+            "description": "List of task items.",
             "items": {
               "type": "object"
             }
           }
-        }
+        },
+        "required": [
+          "count",
+          "hasMore",
+          "limit",
+          "links",
+          "offset"
+        ]
       }
     },
     "title": "Get all tasks",
@@ -140,23 +123,23 @@
         "Content-Type": "application/json"
       },
       "queryParams": {
-        "expand": "{{rawPayload.expand}}",
-        "fields": "{{rawPayload.fields}}",
-        "finder": "{{rawPayload.finder}}",
-        "limit": "{{rawPayload.limit}}",
-        "links": "{{rawPayload.links}}",
-        "offset": "{{rawPayload.offset}}",
-        "onlyData": "{{rawPayload.onlyData}}",
-        "orderBy": "{{rawPayload.orderBy}}",
-        "q": "{{rawPayload.q}}",
-        "totalResults": "{{rawPayload.totalResults}}"
+        "expand": "{{ rawPayload.expand }}",
+        "fields": "{{ rawPayload.fields }}",
+        "finder": "{{ rawPayload.finder }}",
+        "limit": "{{ if(rawPayload.limit <= 0){ return null; } return rawPayload.limit; }}",
+        "offset": "{{ rawPayload.offset ?: 0 }}",
+        "onlyData": "{{ rawPayload.onlyData }}",
+        "orderBy": "{{ rawPayload.orderBy }}",
+        "q": "{{ rawPayload.q }}",
+        "links": "{{ rawPayload.links }}",
+        "totalResults": "{{ rawPayload.totalResults }}"
       }
     }
   },
   "paginationStrategy": {
-    "type": "com.unifyapps.connectors.infra.configs.pagination.OffsetPaginationConfig",
-    "offsetValueTemplate": "{{ return (previousCursor?.offset || 0) + (rawPayload.limit || 25); }}",
+    "type": "com.unifyapps.connectors.infra.configs.pagination.CursorPaginationConfig",
+    "cursorValueTemplate": "{{ return { \"offset\": (previousCursor?.offset ?: 0) + (rawPayload.limit ?: 100), \"limit\": rawPayload.limit ?: 100 }; }}",
     "stopConditionTemplate": "{{ !response.body.hasMore }}",
-    "initOffsetValueTemplate": "{{ return 0; }}"
+    "initCursorValueTemplate": "{{ return { \"offset\": 0, \"limit\": rawPayload.limit ?: 100 }; }}"
   }
 }

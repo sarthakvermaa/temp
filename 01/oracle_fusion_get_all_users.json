@@ -1,7 +1,7 @@
 {
   "resource": {
     "applicationName": "oracle_fusion",
-    "description": "Get all users",
+    "description": "Get all users in Oracle Fusion",
     "input": {
       "type": "SCHEMA",
       "schema": {
@@ -9,38 +9,33 @@
         "properties": {
           "attributes": {
             "type": "string",
-            "title": "Attributes",
-            "description": "Comma-separated list of attribute values to include in the response"
+            "description": "Comma-separated list of attributes to include in the response."
           },
           "count": {
             "type": "integer",
-            "title": "Count",
-            "description": "Number of resources to return"
+            "description": "Number of resource instances to return in the current range."
           },
           "filter": {
             "type": "string",
-            "title": "Filter",
-            "description": "Query expression to filter user resources"
+            "description": "Query expression to retrieve a subset of user resources. Example: firstName pr and userType eq Employee."
           },
           "sortBy": {
             "type": "string",
-            "title": "Sort By",
-            "description": "Attributes to sort the resources by"
+            "description": "Attributes to sort the resource collection by. Example: active"
           },
           "sortOrder": {
             "type": "string",
-            "title": "Sort Order",
-            "description": "Order of sorting (ascending or descending)"
+            "description": "Order direction, e.g., ascending or descending."
           },
           "startIndex": {
             "type": "integer",
-            "title": "Start Index",
-            "description": "1-based index for the first result in the response"
+            "description": "1-based index for the first result included in the response (pagination)."
           }
-        }
+        },
+        "required": []
       }
     },
-    "name": "oracle_fusion_get_all_users",
+    "name": "oracle_fusion_all_get_users",
     "needsAuthentication": true,
     "output": {
       "type": "SCHEMA",
@@ -49,116 +44,17 @@
         "properties": {
           "itemsPerPage": {
             "type": "integer",
-            "title": "Items Per Page"
+            "description": "The number of resource instances returned in the current range."
           },
           "startIndex": {
             "type": "integer",
-            "title": "Start Index"
+            "description": "Starting position in the resource collection."
           },
           "Resources": {
-            "title": "Resources",
             "type": "array",
+            "description": "The user resources in the collection.",
             "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "title": "User ID"
-                },
-                "meta": {
-                  "type": "object",
-                  "properties": {
-                    "created": {
-                      "type": "string",
-                      "title": "Created"
-                    },
-                    "lastModified": {
-                      "type": "string",
-                      "title": "Last Modified"
-                    },
-                    "location": {
-                      "type": "string",
-                      "title": "Location"
-                    }
-                  }
-                },
-                "schemas": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "title": "Schemas"
-                },
-                "userName": {
-                  "type": "string",
-                  "title": "Username"
-                },
-                "name": {
-                  "type": "object",
-                  "properties": {
-                    "familyName": {
-                      "type": "string",
-                      "title": "Family Name"
-                    },
-                    "givenName": {
-                      "type": "string",
-                      "title": "Given Name"
-                    }
-                  }
-                },
-                "displayName": {
-                  "type": "string",
-                  "title": "Display Name"
-                },
-                "emails": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "value": {
-                        "type": "string",
-                        "title": "Email"
-                      },
-                      "type": {
-                        "type": "string",
-                        "title": "Email Type"
-                      },
-                      "primary": {
-                        "type": "boolean",
-                        "title": "Primary Email"
-                      }
-                    }
-                  }
-                },
-                "roles": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "title": "Role ID"
-                      },
-                      "value": {
-                        "type": "string",
-                        "title": "Role Value"
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "title": "Role Display Name"
-                      },
-                      "description": {
-                        "type": "string",
-                        "title": "Role Description"
-                      }
-                    }
-                  }
-                },
-                "active": {
-                  "type": "boolean",
-                  "title": "Active"
-                }
-              }
+              "type": "object"
             }
           }
         }
@@ -179,19 +75,19 @@
         "Content-Type": "application/json"
       },
       "queryParams": {
-        "attributes": "{{rawPayload.attributes}}",
-        "count": "{{rawPayload.count}}",
-        "filter": "{{rawPayload.filter}}",
-        "sortBy": "{{rawPayload.sortBy}}",
-        "sortOrder": "{{rawPayload.sortOrder}}",
-        "startIndex": "{{rawPayload.startIndex}}"
+        "attributes": "{{ rawPayload.attributes }}",
+        "count": "{{ if(rawPayload.count <= 0){ return null; } return rawPayload.count; }}",
+        "filter": "{{ rawPayload.filter }}",
+        "sortBy": "{{ rawPayload.sortBy }}",
+        "sortOrder": "{{ rawPayload.sortOrder }}",
+        "startIndex": "{{ rawPayload.startIndex ?: 1 }}"
       }
     }
   },
   "paginationStrategy": {
     "type": "com.unifyapps.connectors.infra.configs.pagination.CursorPaginationConfig",
     "cursorValueTemplate": "{{ return { \"startIndex\": (previousCursor?.startIndex ?: 1) + (rawPayload.count ?: 100), \"count\": rawPayload.count ?: 100 }; }}",
-    "stopConditionTemplate": "{{ response.body.Resources.length === 0 }}",
+    "stopConditionTemplate": "{{ !response.body.Resources || response.body.Resources.length < (rawPayload.count ?: 100) }}",
     "initCursorValueTemplate": "{{ return { \"startIndex\": 1, \"count\": rawPayload.count ?: 100 }; }}"
   }
 }

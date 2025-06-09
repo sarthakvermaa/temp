@@ -1,15 +1,12 @@
 {
   "resource": {
     "applicationName": "oracle_fusion",
-    "description": "Get all organization tree nodes in Oracle Fusion",
+    "description": "Get all projects in Oracle Fusion",
     "input": {
       "type": "SCHEMA",
       "schema": {
         "type": "object",
         "properties": {
-          "effectiveDate": {
-            "type": "string"
-          },
           "expand": {
             "type": "string"
           },
@@ -44,7 +41,7 @@
         "required": []
       }
     },
-    "name": "oracle_fusion_get_all_organization_tree_nodes",
+    "name": "oracle_fusion_get_all_projects",
     "needsAuthentication": true,
     "output": {
       "type": "SCHEMA",
@@ -113,7 +110,7 @@
         ]
       }
     },
-    "title": "Get all organization tree nodes",
+    "title": "Get all projects",
     "resourceTypes": [
       "ACTION"
     ]
@@ -123,12 +120,11 @@
       "type": "com.unifyapps.connectors.infra.configs.clients.HTTPClientConfig",
       "baseUrlTemplate": "{{input.auth.domain}}",
       "httpMethod": "GET",
-      "pathTemplate": "/hcmRestApi/resources/11.13.18.05/organizationTreeNodesLOV",
+      "pathTemplate": "/fscmRestApi/resources/11.13.18.05/projects",
       "headers": {
         "Content-Type": "application/json"
       },
       "queryParams": {
-        "effectiveDate": "{{ rawPayload.effectiveDate }}",
         "expand": "{{ rawPayload.expand }}",
         "fields": "{{ rawPayload.fields }}",
         "finder": "{{ rawPayload.finder }}",
